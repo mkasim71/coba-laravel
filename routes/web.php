@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
 use App\Models\Category;
 use App\Models\User;
+use App\Http\Controllers\UnsplashController;
+use App\Services\UnsplashService;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,27 +42,67 @@ Route::get('/about', function () {
 
 Route::get('/blog', [PostController::class, 'index']);
 
-// halaman single post
 
+// halaman single post
 Route::get('posts/{post:slug}', [PostController::class, 'show']);
 
+
 Route::get('/categories', function() {
+    $categories = Category::all();
+
+    $unsplash = new UnsplashService();
+    $photos = [];
+    foreach ($categories as $category) {
+        $photos[$category->id] = $unsplash->randomPhoto($category->name);
+    }
+
+
 return view('categories', [
         'title' => 'Post Categories',
-        'categories' => Category::all()
+        "active" => 'categories',
+        'photos' => $photos,
+        'categories' => $categories
     ]);
 });
 
 Route::get('/categories/{category:slug}', function(Category $category) {
+
+    $unsplash = new UnsplashService();
+    $posts = $category->posts->load('author', 'category');
+    $photos = [];
+
+    foreach ($posts as $post) {
+		$photos[$post->id] = $unsplash->randomPhoto($post->category->name);
+	}
+    
     return view('posts', [
         'title' => "Post By Category : $category->name",
-        'posts' => $category->posts->load('author', 'category'),
+        "active" => 'categories',
+        'photos' => $photos,
+        'posts' => $posts,
     ]);
 });
 
 Route::get('/authors/{author:username}', function(User $author) {
+
+    $unsplash = new UnsplashService();
+    $posts = $author->posts->load('category','author');
+    $photos = [];
+
+    foreach ($posts as $post) {
+		$photos[$post->id] = $unsplash->randomPhoto($post->category->name);
+	}
+    
     return view('posts', [
         'title' =>"Post By Author : $author->name",
-        'posts' => $author->posts->load('category','author'),
+        'photos' => $photos,
+        'posts' => $posts,
     ]);
 });
+
+Route::get('/posts/{post:slug}', [PostController::class, 'show']);
+// Route::get('/categories/{category:slug}', [PostController::class, 'showCategory']);
+
+
+Route::get('/unsplash/search', [UnsplashController::class, 'search']);
+Route::get('/unsplash/random', [UnsplashController::class, 'random']);
