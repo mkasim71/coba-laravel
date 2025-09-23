@@ -9,7 +9,7 @@
 			@foreach ( $categories as $category)
 				<div class="col-md-4">
 					<a href="/posts?category={{ $category->slug }}">
-						<div class="card bg-dark text-white">
+						<div class="card bg-dark text-white mb-3">
 							<img src="{{ $photos[$category->id]['urls']['full'] }}" 
 								class="card-img" 
 								alt="{{ $photos[$category->id]['alt_description'] ?? 'Random Unsplash Photo' }}">
