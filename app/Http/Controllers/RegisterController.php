@@ -20,19 +20,19 @@ class RegisterController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|max:255',
-						'username' => ['required', 'min:3', 'max:255', 'unique:users'],
-						'email' => 'required|email:dns|unique:users',
-						'password' => 'required|min:5|max:255'
+            'username' => ['required', 'min:3', 'max:255', 'unique:users'],
+            'email' => 'required|email:dns|unique:users',
+            'password' => 'required|min:5|max:255'
         ]);
 
-				// $validatedData['password'] = bcrypt($validatedData['password']);
-				$validatedData['password'] = Hash::make($validatedData['password']);
+        // $validatedData['password'] = bcrypt($validatedData['password']);
+        $validatedData['password'] = Hash::make($validatedData['password']);
 
 
-				User::create($validatedData);
+        User::create($validatedData);
 
-				// $request->session()->flash('success', 'Registration successfull! Please login');
+        // $request->session()->flash('success', 'Registration successfull! Please login');
 
-				return redirect('/login')->with('success', 'Registration successfull! Please login');
+        return redirect('/login')->with('success', 'Registration successfull! Please login');
     }
 }
